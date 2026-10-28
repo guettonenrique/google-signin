@@ -16,7 +16,7 @@ Skill path: `skills/react-native-nitro-google-signin/` (`SKILL.md`, `reference.m
 ## Package
 
 - **npm:** `react-native-nitro-google-signin`
-- **Peer:** `react-native-nitro-modules` ≥ 0.36 (required); see `compatibility.json`
+- **Peer:** `react-native-nitro-modules` ≥ 0.36 (required); see `compatibility.json`. The error `code` is parsed from the text Nitro passes on (Android: fbjni `Throwable.toString()` plus stack trace; iOS: `String(describing:)`); if that changes, errors arrive without a code, never a crash
 - **API:** `GoogleOneTapSignIn`
 - **RN:** ≥ 0.76 · **Platforms:** Android, iOS · **Expo:** dev client only
 

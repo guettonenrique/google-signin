@@ -9,6 +9,7 @@
   "source": "src/index",
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "test": "bun test",
     "clean": "git clean -dfX",
     "release": "semantic-release",
     "build": "bun run typecheck && bob build",
@@ -98,6 +99,7 @@
     "@jamesacarr/eslint-formatter-github-actions": "^0.2.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
+    "@types/bun": "^1.4.3",
     "@types/jest": "^29.5.12",
     "@types/react": "19.2.0",
     "nitrogen": "0.37.1",
@@ -173,7 +175,7 @@
       [
         "typescript",
         {
-          "project": "tsconfig.json"
+          "project": "tsconfig.build.json"
         }
       ]
     ]

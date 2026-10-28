@@ -37,12 +37,18 @@ export const statusCodes = {
   /** User cancelled an authorization or sign-in flow. */
   SIGN_IN_CANCELLED: 'SIGN_IN_CANCELLED',
   /**
-   * Android OAuth misconfiguration (wrong/missing SHA-1, package name, or
-   * Android client ID used as `webClientId`). Thrown when Credential Manager /
+   * OAuth misconfiguration. Android: wrong/missing SHA-1, package name, or
+   * Android client ID used as `webClientId`, thrown when Credential Manager /
    * AuthorizationClient surfaces a developer error — not for silent `cancelled`
    * responses (see troubleshooting for production `cancelled` after account pick).
+   * iOS: the reversed client id is not a registered URL scheme in Info.plist,
+   * thrown before GoogleSignIn would raise an uncatchable NSException for it.
    */
   DEVELOPER_ERROR: 'DEVELOPER_ERROR',
+  /** Android — clearing the Credential Manager state failed during `signOut()`. */
+  SIGN_OUT_FAILED: 'SIGN_OUT_FAILED',
+  /** Android — `revokeAccess()` could not revoke the grant. */
+  REVOKE_ACCESS_FAILED: 'REVOKE_ACCESS_FAILED',
 } as const
 
 export type StatusCode = (typeof statusCodes)[keyof typeof statusCodes]
@@ -53,6 +59,8 @@ export class GoogleSignInError extends Error {
   code: StatusCode
   /** Optional metadata (e.g. Play Services status on Android). */
   userInfo?: Record<string, string>
+  /** The raw error that crossed the Nitro bridge, when there was one. */
+  cause?: unknown
 
   constructor(
     code: StatusCode,
@@ -63,6 +71,49 @@ export class GoogleSignInError extends Error {
     this.name = 'GoogleSignInError'
     this.code = code
     this.userInfo = userInfo
+  }
+}
+
+const isStatusCode = (value: string): value is StatusCode =>
+  Object.values(statusCodes).includes(value as StatusCode)
+
+// `[CODE] message`, or `NitroGoogleSignin.method(...): [CODE] message` for a synchronous throw.
+const BRIDGED_ERROR = /^(?:[\w.]+\(\.\.\.\): )?\[([A-Z_]+)\] ([\s\S]*)$/
+
+// Android appends the Kotlin stack trace to the text Nitro passes on.
+const STACK_TRACE_START = '\n\tat '
+
+/**
+ * Turns an error that crossed the Nitro bridge back into a {@link GoogleSignInError}.
+ *
+ * Nitro rejects with the native error's text alone, so the native side writes the
+ * status code into that text as a `[CODE] ` prefix. This reads it back out, keeps
+ * the bridged error as `cause`, and returns anything it does not recognise unchanged.
+ */
+export function toGoogleSignInError(error: unknown): unknown {
+  if (error instanceof GoogleSignInError || !(error instanceof Error)) {
+    return error
+  }
+  const match = BRIDGED_ERROR.exec(error.message)
+  const code = match?.[1]
+  const text = match?.[2]
+  if (code === undefined || text === undefined || !isStatusCode(code)) {
+    return error
+  }
+  const message = text.split(STACK_TRACE_START, 1)[0] ?? text
+  const bridged = new GoogleSignInError(code, message)
+  bridged.cause = error
+  return bridged
+}
+
+/** Runs a native call and gives both a synchronous throw and a rejection their `code` back. */
+export function bridged<T>(call: () => Promise<T>): Promise<T> {
+  try {
+    return call().catch((error: unknown) => {
+      throw toGoogleSignInError(error)
+    })
+  } catch (error) {
+    throw toGoogleSignInError(error)
   }
 }
 

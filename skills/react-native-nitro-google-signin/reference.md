@@ -44,6 +44,8 @@ Full types: https://react-native-nitro-google-sign-in.github.io/docs/guide/api-r
 
 Helpers: `isSuccessResponse`, `isNoSavedCredentialFoundResponse`, `isCancelledResponse`, `isErrorWithCode`, `statusCodes`, `GoogleSignInError`
 
+Errors thrown by the native side reach JS as `GoogleSignInError` with `code` set (one of `statusCodes`) and the raw bridged error as `cause`.
+
 ### Button
 
 `GoogleSignInButton`, `useGoogleSignInFromButton`, `GOOGLE_SIGN_IN_BUTTON_HEIGHT` (48), `GOOGLE_SIGN_IN_BUTTON_WIDTH` (`standard` 230 / `wide` 312 / `icon` 48), `signInBehavior`: `credentialManager` | `buttonFlow` | `none`

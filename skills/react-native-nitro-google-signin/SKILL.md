@@ -80,6 +80,7 @@ if (isSuccessResponse(response)) {
 | Symptom | Likely fix |
 | ------- | ---------- |
 | `DEVELOPER_ERROR` (Android) | Wrong SHA-1 or package on OAuth client |
+| `DEVELOPER_ERROR` (iOS) | The reversed client id is not in `CFBundleURLSchemes`; add the `REVERSED_CLIENT_ID` URL scheme |
 | `type: 'cancelled'` after picking account (Android release/Play) | Missing **Play App Signing** / release SHA-1 on Android OAuth client — [troubleshooting](https://react-native-nitro-google-sign-in.github.io/docs/guide/troubleshooting#cancelled-after-account-pick) |
 | `default_web_client_id was not found` | Add `google-services.json` + Gradle plugin |
 | iOS redirect fails | Fix `REVERSED_CLIENT_ID` URL scheme. On scene lifecycle apps, ensure `GIDSignIn.sharedInstance.handle(url)` is in `SceneDelegate.swift` |

@@ -28,7 +28,7 @@ High-performance [Universal (One Tap) Google Sign-In](https://react-native-nitro
 ## Requirements
 
 - React Native **≥ 0.76**
-- [`react-native-nitro-modules`](https://nitro.margelo.com) **≥ 0.36** (**0.37.x** recommended with 2.0.x)
+- [`react-native-nitro-modules`](https://nitro.margelo.com) **≥ 0.36** (**0.37.x** recommended with 2.0.x). The error `code` is read from the error text Nitro passes on (Android: fbjni renders `Throwable.toString()` plus the stack trace; iOS: Nitro uses `String(describing:)`). If a Nitro or fbjni change alters that text, errors arrive without a `code`; nothing crashes.
 
 See the [compatibility guide](https://react-native-nitro-google-sign-in.github.io/docs/getting-started/compatibility) for the full version matrix.
 

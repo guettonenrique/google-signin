@@ -22,6 +22,7 @@ export {
   isNoSavedCredentialFoundResponse,
   isSuccessResponse,
   statusCodes,
+  toGoogleSignInError,
 } from './types'
 export type {
   GetTokensResponse,
