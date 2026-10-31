@@ -15,17 +15,28 @@ const viewManagerDir = path.join(
   'nitrogen/generated/android/kotlin/com/margelo/nitro/nitrogooglesignin/views'
 )
 
+const OLD_RECYCLE = `@Suppress("USELESS_IS_CHECK")
+    if (hybridView is RecyclableView) {
+      // Recycle in it's implementation
+      hybridView.prepareForRecycle()`
+
+const NEW_RECYCLE = `val recyclableView = (hybridView as Any) as? RecyclableView
+    if (recyclableView != null) {
+      // Recycle in it's implementation
+      recyclableView.prepareForRecycle()`
+
 const updateViewManagerFiles = async (file) => {
   const viewManagerFile = path.join(viewManagerDir, file)
 
-  const viewManagerStr = await readFile(viewManagerFile, { encoding: 'utf8' })
-  await writeFile(
-    viewManagerFile,
-    viewManagerStr.replace(
+  let viewManagerStr = await readFile(viewManagerFile, { encoding: 'utf8' })
+  viewManagerStr = viewManagerStr
+    .replace(
       /com\.margelo\.nitro\.nitrogooglesignin\.\*/g,
       'com.nitrogooglesignin.*'
     )
-  )
+    .replace(OLD_RECYCLE, NEW_RECYCLE)
+
+  await writeFile(viewManagerFile, viewManagerStr)
 }
 
 const androidWorkaround = async () => {

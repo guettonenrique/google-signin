@@ -77,9 +77,9 @@ class GoogleSignInButtonViewManager : SimpleViewManager<View>() {
     val hybridView = holder.hybridView
     holder.lastState = null
 
-    @Suppress("USELESS_IS_CHECK")
-    if (hybridView is RecyclableView) {
-      hybridView.prepareForRecycle()
+    val recyclableView = (hybridView as Any) as? RecyclableView
+    if (recyclableView != null) {
+      recyclableView.prepareForRecycle()
       return hybridView.view
     }
     return null
